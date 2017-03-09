@@ -100,6 +100,7 @@ def _add_social_account(request, sociallogin):
         return HttpResponseRedirect(reverse('socialaccount_connections'))
     level = messages.INFO
     message = 'socialaccount/messages/account_connected.txt'
+    action = None
     if sociallogin.is_existing:
         if sociallogin.user != request.user:
             # Social account of other user. For now, this scenario
@@ -112,9 +113,10 @@ def _add_social_account(request, sociallogin):
             # This account is already connected -- let's play along
             # and render the standard "account connected" message
             # without actually doing anything.
-            pass
+            action = 'updated'
     else:
         # New account, let's connect
+        action = 'added'
         sociallogin.connect(request, request.user)
         try:
             signals.social_account_added.send(sender=SocialLogin,
@@ -126,7 +128,13 @@ def _add_social_account(request, sociallogin):
         request,
         sociallogin.account)
     next_url = sociallogin.get_redirect_url(request) or default_next
-    get_account_adapter(request).add_message(request, level, message)
+    get_account_adapter(request).add_message(
+        request, level, message,
+        message_context={
+            'sociallogin': sociallogin,
+            'action': action
+        }
+    )
     return HttpResponseRedirect(next_url)
 
 
