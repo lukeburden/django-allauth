@@ -70,7 +70,14 @@ allauth.socialaccount
 
 - `allauth.socialaccount.signals.social_account_added(request, sociallogin)`
 
-  Sent after a user connects a social account to a their local account.
+  Sent after a user adds a social account to a their local account. This
+  can be at signup or when the user connects a social account.
+
+- `allauth.socialaccount.signals.social_account_updated(request, sociallogin)`
+
+  Sent after a social account has been updated. This happens when a user
+  logs in using an already connected social account. Useful if you need to
+  unpack extra data for social accounts as they are updated.
 
 - `allauth.socialaccount.signals.social_account_removed(request, socialaccount)`
 
